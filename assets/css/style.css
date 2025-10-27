@@ -1,0 +1,69 @@
+/* Style Settings */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap');
+
+body {
+    background-color: rgba(255, 255, 255, 1);
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+}
+
+#userPhoto {
+    width: 200px;
+    height: 200px;
+    display: block;
+    margin: 10px auto;
+    border-radius: 20%;
+}
+
+#userName {
+    color: rgba(28, 87, 252, 1);
+    display: block;
+    width: 100%;
+    text-align: center;
+    text-decoration: none;    
+    font-weight: bolder;
+}
+
+#userName h1 {
+    font-size: 2rem;
+    letter-spacing: 0.2rem;
+    margin: 0 auto;
+}
+
+#userName h2 {
+    margin-top: 5px;
+    text-transform: none;
+    color: rgba(252, 41, 133, 0.4);
+}
+
+i.fa {
+    margin-right: 0.3rem;
+}
+
+#links {
+    max-width: 500px;
+    width: auto;
+    display: block;
+    margin: 20px auto;
+}
+
+.link {
+    display: block;
+    background-color: rgba(28, 87, 252, 1);
+    color: #fff;
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 17px;
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: 300;
+    transition: all .25s cubic-bezier(.08, .59, .29, .99);
+    border-radius: 10px;
+
+}
+
+.link:hover {
+    background-color: rgba(252, 41, 133, 0.3);
+    color: #000000;
+    border: none;
+}
