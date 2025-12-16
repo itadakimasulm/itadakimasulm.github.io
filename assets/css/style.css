@@ -67,3 +67,83 @@ i.fa {
     color: #000000;
     border: none;
 }
+
+/* Keyframes for slight rotation shaking */
+@keyframes slightRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(2.5deg);
+  } /* Slight rotation to the right */
+  50% {
+    transform: rotate(-2.5deg);
+  } /* Slight rotation to the left */
+  75% {
+    transform: rotate(2.5deg);
+  } /* Slight rotation to the right */
+  100% {
+    transform: rotate(0deg);
+  } /* Back to original */
+}
+
+@keyframes Buzz_animation {
+  0% {
+    transform: translateX(3px) rotate(1deg);
+  }
+
+  2.5% {
+    transform: translateX(-3px) rotate(-1deg);
+  }
+
+  5% {
+    transform: translateX(3px) rotate(1deg);
+  }
+
+  7.5% {
+    transform: translateX(-3px) rotate(-1deg);
+  }
+
+  10% {
+    transform: translateX(2px) rotate(1deg);
+  }
+
+  12.5% {
+    transform: translateX(-2px) rotate(-1deg);
+  }
+
+  15% {
+    transform: translateX(2px) rotate(1deg);
+  }
+
+  17.5% {
+    transform: translateX(-2px) rotate(-1deg);
+  }
+
+  20% {
+    transform: translateX(1px) rotate(1deg);
+  }
+
+  22.5% {
+    transform: translateX(-1px) rotate(-1deg);
+  }
+
+  25% {
+    transform: translateX(0) rotate(0);
+  }
+}
+
+/* Class to apply the animation */
+.rotate {
+  /* apply both animations by including both animation declarations separated by comma */
+  animation: slightRotate 0.5s ease-in-out 0s 2 forwards,
+    slightRotate 0.5s ease-in-out 3s 2 forwards;
+}
+
+.Buzz_animation {
+  animation: Buzz_animation 3s linear infinite;
+}
+
+.Buzz_animation:active {
+  animation: unset;
+}
