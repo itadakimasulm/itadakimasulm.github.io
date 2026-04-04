@@ -1,76 +1,43 @@
 <!DOCTYPE html>
 
 <html lang="es">
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta charset="UTF-8" />
-    <title>Itadakimasu Sushi Fusión</title>
-    <link rel="stylesheet" href="assets/css/style.css" />
-    <link rel="stylesheet" href="assets/css/font-awesome.min.css" />
-    <link rel="icon" href="assets/images/favicon.png" type="image/x-icon" />
-<script type="text/javascript">
-    (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "twhjkyhexc");
-</script>
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="description" content="Itadakimasu Sushi Fusión — El sabor de Japón. Ubicados en Los Mochis, Sin. Abierto Jueves a Lunes de 5:00 pm a 11:00 pm." />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Itadakimasu Sushi Fusión</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="assets/css/font-awesome.min.css" />
+  <link rel="icon" href="assets/media/favicon.png" type="image/x-icon" />
+  <script src="https://cdn.weavely.ai/embed.js"></script>
+  <script src="assets/js/script.js" defer></script>
+</head>
 
-  <body>
-    <div id="profile">
-      <img
-        id="userPhoto"
-        src="assets/images/profile.jpg"
-        alt="itadakimasulm's profile picture"
-      />
-      <div id="userName">
-        <h1>Itadakimasu Sushi Fusion</h1>
-        <h2>El sabor de Japón (sin salir del barrio)</h2>
-        <div>
-          📍 Blvrd Chihuahuita, Mochicahui, 81263 Los Mochis, Sin., Mexico
-        </div>
-        <div>📅 Jueves a lunes</div>
-        <div>⌚ 5:00 pm - 11:00 pm</div>
-      </div>
+<body>
+  <div id="profile">
+    <img id="userPhoto" src="assets/media/profile.png" alt="itadakimasulm's profile picture" />
+    <div id="userName">
+      <h1>Itadakimasu Sushi Fusion</h1>
+      <h2>El sabor de Japón</h2>
+      <div>📍Blvrd Chihuahuita, Mochicahui, 81263 Los Mochis, Sin., Mexico</div>
+      <div>📅 Jueves a Lunes</div>
+      <div>⌚ 5:00 pm - 11:00 pm</div>
     </div>
-    <div id="links">
-      <a
-        class="link"
-        href="assets/images/Menú Itadaki 2026-01-21.pdf"
-        target="_blank"
-        ><i class="fa fa-cutlery" aria-hidden="true"></i> Menú</a
-      >
-      <a class="link Buzz_animation" id="registrateButton" href="https://docs.google.com/forms/d/e/1FAIpQLSda-vy09VX0w8N9Bv0Sy27gZSnDbXPnuMsJXuSvX7fSlUCAOw/viewform?usp=dialog"><i class="fa fa-bell" aria-hidden="true"></i> ¡Regístrate para promociones!</a>
-      <a
-        class="link"
-        href="https://www.facebook.com/people/Itadakimasu-Sushi-Fusi%C3%B3n/61577594511317/"
-        target="_blank"
-        ><i class="fa fa-facebook-f" aria-hidden="true"></i> Facebook</a
-      >
-      <a
-        class="link"
-        href="https://www.instagram.com/itadakimasulm/"
-        target="_blank"
-        ><i class="fa fa-instagram" aria-hidden="true"></i> Instagram</a
-      >
-      <a class="link" href="https://wa.me/+526681293315" target="_blank"
-        ><i class="fa fa-whatsapp" aria-hidden="true"></i> WhatsApp</a
-      >
-      <a
-        class="link"
-        href="https://maps.app.goo.gl/S5nDeDx63SUh92Br7"
-        target="_blank"
-        ><i class="fa fa-map-pin" aria-hidden="true"></i> Ubicación</a
-      >
-      <a class="link" href="mailto:itadakimas.sushi@gmail.com" target="_blank"
-        ><i class="fa fa-envelope" aria-hidden="true"></i> E-mail</a
-      >
-    </div>
-  </body>
+  </div>
+  <div id="links">
+    <a class="link" href="assets/media/menu-2026-01-21.pdf" target="_blank" rel="noopener noreferrer"><i class="fa fa-cutlery" aria-hidden="true"></i> Menú</a>
+    <a class="link Buzz_animation" id="registrateButton" href="#"><i class="fa fa-bell" aria-hidden="true"></i> ¡Regístrate para promociones!</a>
+    <a class="link" href="https://www.facebook.com/people/Itadakimasu-Sushi-Fusi%C3%B3n/61577594511317/" target="_blank" rel="noopener noreferrer"><i class="fa fa-facebook-f" aria-hidden="true"></i> Facebook</a>
+    <a class="link" href="https://www.instagram.com/itadakimasulm/" target="_blank" rel="noopener noreferrer"><i class="fa fa-instagram" aria-hidden="true"></i> Instagram</a>
+    <a class="link" id="whatsappLink" href="#" target="_blank" rel="noopener noreferrer"><i class="fa fa-whatsapp" aria-hidden="true"></i> WhatsApp</a>
+    <a class="link" href="https://maps.app.goo.gl/S5nDeDx63SUh92Br7" target="_blank" rel="noopener noreferrer"><i class="fa fa-map-pin" aria-hidden="true"></i> Ubicación</a>
+    <a class="link" href="mailto:itadakimas.sushi@gmail.com" rel="noopener noreferrer"><i class="fa fa-envelope" aria-hidden="true"></i> E-mail</a>
+  </div>
+  <!-- Modal Overlay -->
+  <div id="modalOverlay"></div>
+
+  <!-- Popup Form -->
+  <div id="popupForm" data-weavely-form="6daea6a7-9fe9-4328-8b2b-5ed9e3197012" data-weavely-mode="embed" style="width:100%"></div>
+</body>
+
 </html>
-
-
-
-
-
