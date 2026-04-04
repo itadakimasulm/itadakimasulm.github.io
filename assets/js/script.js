@@ -15,7 +15,7 @@ const WHATSAPP_MESSAGE = "Hola, me gustaria ordenar";
   t.src = "https://www.clarity.ms/tag/" + i;
   y = l.getElementsByTagName(r)[0];
   y.parentNode.insertBefore(t, y);
-})(window, document, "clarity", "script", "tvskmotj4t");
+})(window, document, "clarity", "script", "twhjkyhexc");
 
 // DOM-ready wrapper to ensure elements are present
 function initModalHandlers() {
