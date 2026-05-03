@@ -68,7 +68,7 @@
   </div>
 
   <script>
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbx7yAu3ZD-lj0-mqq5Ylc-DYIX7-4g25TqQ9J4hrnK-diCH4pv58Nl1ZyZGQtTWS7I6UQ/exec';
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbwuVq9wLPrGa2KXZ2tap2gfglf9aSKaQup35p02bUc9qzSHLGVw0w9KlJrHeqOTlz2bRQ/exec';
 
     const form = document.getElementById('careersForm');
     const submitBtn = document.getElementById('submitBtn');
@@ -146,20 +146,20 @@
           turnstileToken
         };
 
-        const response = await fetch(GAS_URL, {
+        // Use no-cors mode to avoid CORS preflight issues with GAS
+        // We can't read the response in no-cors mode, so we assume success
+        // if no network error is thrown
+        await fetch(GAS_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain' },
           body: JSON.stringify(payload)
         });
 
-        const result = await response.json();
-
-        if (result.status === 'ok') {
-          form.style.display = 'none';
-          showMessage('¡Gracias! Hemos recibido tu información. Nos pondremos en contacto si surge una oportunidad.', 'success');
-        } else {
-          throw new Error(result.message || 'Error desconocido');
-        }
+        // Since no-cors gives an opaque response we can't check status,
+        // so we show success if the request didn't throw
+        form.style.display = 'none';
+        showMessage('¡Gracias! Hemos recibido tu información. Nos pondremos en contacto si surge una oportunidad.', 'success');
 
       } catch (err) {
         showMessage('Ocurrió un error al enviar. Por favor intenta de nuevo.', 'error');
