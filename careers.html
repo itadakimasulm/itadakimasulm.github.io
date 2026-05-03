@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Únete al equipo — Itadakimasu Sushi Fusión</title>
+  <link rel="icon" href="assets/media/favicon.png" type="image/png" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <!-- Cloudflare Turnstile -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body>
+
+  <div class="careers-page">
+
+    <h1>Sé parte del equipo Itadakimasu</h1>
+
+    <p class="tagline">
+      Siempre nos interesa conocer personas con pasión por el servicio y la gastronomía japonesa.
+      Si crees que encajas con nuestra filosofía, déjanos tus datos y nos pondremos en contacto
+      cuando tengamos una oportunidad disponible.
+    </p>
+
+    <p class="roles">Perfiles de interés: Sushero/a &nbsp;·&nbsp; Cajero/a</p>
+
+    <form class="careers-form" id="careersForm" novalidate>
+
+      <div>
+        <label for="nombre">Nombre completo *</label>
+        <input type="text" id="nombre" name="nombre" required placeholder="Tu nombre completo" />
+      </div>
+
+      <div>
+        <label for="telefono">Teléfono *</label>
+        <input type="tel" id="telefono" name="telefono" required placeholder="Ej. 668 123 4567" />
+      </div>
+
+      <div>
+        <label for="email">Correo electrónico *</label>
+        <input type="email" id="email" name="email" required placeholder="tucorreo@ejemplo.com" />
+      </div>
+
+      <div>
+        <span class="file-label">CV (archivo) *</span>
+        <input
+          type="file"
+          id="cv"
+          name="cv"
+          required
+          accept=".pdf,.doc,.docx,.rtf"
+        />
+        <span class="file-hint">Formatos aceptados: PDF, DOC, DOCX, RTF · Máximo 10 MB</span>
+      </div>
+
+      <!-- Cloudflare Turnstile widget -->
+      <div class="turnstile-wrapper">
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAADIa7s30V27Ywbvq"></div>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">Enviar</button>
+
+    </form>
+
+    <div class="form-message" id="formMessage"></div>
+
+    <a href="index.html" class="back-link">← Regresar</a>
+
+  </div>
+
+  <script>
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbx7yAu3ZD-lj0-mqq5Ylc-DYIX7-4g25TqQ9J4hrnK-diCH4pv58Nl1ZyZGQtTWS7I6UQ/exec';
+
+    const form = document.getElementById('careersForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const formMessage = document.getElementById('formMessage');
+
+    const ALLOWED_TYPES = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/rtf',
+      'text/rtf'
+    ];
+    const ALLOWED_EXTENSIONS = ['.pdf', '.doc', '.docx', '.rtf'];
+
+    function showMessage(text, type) {
+      formMessage.textContent = text;
+      formMessage.className = 'form-message ' + type;
+    }
+
+    function validateFileType(file) {
+      const name = file.name.toLowerCase();
+      const hasValidExtension = ALLOWED_EXTENSIONS.some(ext => name.endsWith(ext));
+      const hasValidType = ALLOWED_TYPES.includes(file.type) || file.type === '';
+      return hasValidExtension && hasValidType;
+    }
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const nombre = document.getElementById('nombre').value.trim();
+      const telefono = document.getElementById('telefono').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const cvInput = document.getElementById('cv');
+      const cvFile = cvInput.files[0];
+
+      if (!nombre || !telefono || !email || !cvFile) {
+        showMessage('Por favor completa todos los campos requeridos.', 'error');
+        return;
+      }
+
+      if (!validateFileType(cvFile)) {
+        showMessage('Tipo de archivo no permitido. Por favor sube un PDF, DOC, DOCX o RTF.', 'error');
+        return;
+      }
+
+      if (cvFile.size > 10 * 1024 * 1024) {
+        showMessage('El archivo es demasiado grande. El tamaño máximo es 10 MB.', 'error');
+        return;
+      }
+
+      const turnstileToken = document.querySelector('[name="cf-turnstile-response"]')?.value;
+      if (!turnstileToken) {
+        showMessage('Por favor completa la verificación de seguridad.', 'error');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Enviando...';
+
+      try {
+        const fileBase64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result.split(',')[1]);
+          reader.onerror = () => reject(new Error('Error al leer el archivo'));
+          reader.readAsDataURL(cvFile);
+        });
+
+        const payload = {
+          nombre,
+          telefono,
+          email,
+          fileName: cvFile.name,
+          fileType: cvFile.type || 'application/octet-stream',
+          fileData: fileBase64,
+          turnstileToken
+        };
+
+        const response = await fetch(GAS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (result.status === 'ok') {
+          form.style.display = 'none';
+          showMessage('¡Gracias! Hemos recibido tu información. Nos pondremos en contacto si surge una oportunidad.', 'success');
+        } else {
+          throw new Error(result.message || 'Error desconocido');
+        }
+
+      } catch (err) {
+        showMessage('Ocurrió un error al enviar. Por favor intenta de nuevo.', 'error');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Enviar';
+      }
+    });
+  </script>
+
+</body>
+</html>
