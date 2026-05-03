@@ -158,7 +158,8 @@ i.fa {
 
 /* ============================================================
    CAREERS PAGE
-   Append this block to the end of assets/css/style.css
+   Replace the existing CAREERS PAGE block at the bottom of
+   assets/css/style.css with this one
    ============================================================ */
 
 .careers-page {
@@ -169,23 +170,25 @@ i.fa {
 }
 
 .careers-page h1 {
-  font-size: 1.6rem;
+  font-size: 1.8rem;
   font-weight: 700;
-  margin-bottom: 0.5rem;
-  color: #fff;
+  margin-bottom: 0.75rem;
+  color: rgba(28, 87, 252, 1);
+  letter-spacing: 0.05rem;
 }
 
 .careers-page .tagline {
   font-size: 0.95rem;
-  color: #ccc;
-  margin-bottom: 0.5rem;
-  line-height: 1.5;
+  color: #444;
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
+  font-weight: 300;
 }
 
 .careers-page .roles {
   font-size: 0.95rem;
   font-weight: 600;
-  color: #fff;
+  color: #222;
   margin-bottom: 2rem;
 }
 
@@ -198,9 +201,10 @@ i.fa {
 
 .careers-form label {
   font-size: 0.85rem;
-  color: #ccc;
+  color: #444;
   margin-bottom: 0.25rem;
   display: block;
+  font-weight: 600;
 }
 
 .careers-form input[type="text"],
@@ -208,11 +212,12 @@ i.fa {
 .careers-form input[type="tel"] {
   width: 100%;
   padding: 0.65rem 0.85rem;
-  border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.15);
-  background: rgba(255,255,255,0.07);
-  color: #fff;
+  border-radius: 10px;
+  border: 1px solid rgba(28, 87, 252, 0.3);
+  background: #fff;
+  color: #222;
   font-size: 0.95rem;
+  font-family: "Open Sans", sans-serif;
   box-sizing: border-box;
   transition: border-color 0.2s;
 }
@@ -221,28 +226,30 @@ i.fa {
 .careers-form input[type="email"]:focus,
 .careers-form input[type="tel"]:focus {
   outline: none;
-  border-color: rgba(255,255,255,0.4);
+  border-color: rgba(28, 87, 252, 1);
 }
 
 .careers-form .file-label {
   font-size: 0.85rem;
-  color: #ccc;
+  color: #444;
   margin-bottom: 0.25rem;
   display: block;
+  font-weight: 600;
 }
 
 .careers-form .file-hint {
   font-size: 0.75rem;
-  color: #aaa;
+  color: #888;
   margin-top: 0.25rem;
 }
 
 .careers-form input[type="file"] {
   width: 100%;
   font-size: 0.9rem;
-  color: #ccc;
+  color: #444;
   padding: 0.4rem 0;
   box-sizing: border-box;
+  font-family: "Open Sans", sans-serif;
 }
 
 .careers-form .turnstile-wrapper {
@@ -253,20 +260,22 @@ i.fa {
 
 .careers-form .submit-btn {
   width: 100%;
-  padding: 0.75rem;
-  border-radius: 8px;
+  padding: 17px;
+  border-radius: 10px;
   border: none;
-  background: #fff;
-  color: #000;
-  font-size: 1rem;
-  font-weight: 600;
+  background-color: rgba(28, 87, 252, 1);
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 300;
+  font-family: "Open Sans", sans-serif;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: all 0.25s cubic-bezier(0.08, 0.59, 0.29, 0.99);
   margin-top: 0.5rem;
 }
 
 .careers-form .submit-btn:hover {
-  opacity: 0.85;
+  background-color: rgba(252, 41, 133, 0.3);
+  color: #000;
 }
 
 .careers-form .submit-btn:disabled {
@@ -278,21 +287,21 @@ i.fa {
   margin-top: 1.25rem;
   font-size: 0.9rem;
   padding: 0.75rem 1rem;
-  border-radius: 8px;
+  border-radius: 10px;
   display: none;
 }
 
 .form-message.success {
   background: rgba(100, 200, 120, 0.15);
-  border: 1px solid rgba(100, 200, 120, 0.4);
-  color: #90e8a0;
+  border: 1px solid rgba(100, 200, 120, 0.5);
+  color: #2a7a3b;
   display: block;
 }
 
 .form-message.error {
-  background: rgba(220, 80, 80, 0.15);
+  background: rgba(220, 80, 80, 0.1);
   border: 1px solid rgba(220, 80, 80, 0.4);
-  color: #f08080;
+  color: #c0392b;
   display: block;
 }
 
@@ -300,9 +309,10 @@ i.fa {
   display: inline-block;
   margin-top: 2rem;
   font-size: 0.85rem;
-  color: #ccc;
+  color: rgba(28, 87, 252, 1);
   text-decoration: none;
   opacity: 0.7;
+  font-weight: 300;
 }
 
 .back-link:hover {
