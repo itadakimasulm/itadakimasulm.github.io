@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="assets/css/style.css" />
   <!-- Cloudflare Turnstile -->
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <!-- Clarity analytics + shared site config -->
+  <script src="assets/js/script.js" defer></script>
 </head>
 <body>
 
@@ -23,7 +25,7 @@
 
     <p class="roles">Perfiles de interés: Sushero/a &nbsp;·&nbsp; Cajero/a</p>
 
-    <form class="careers-form" id="careersForm" novalidate>
+    <form class="careers-form" id="careersForm">
 
       <div>
         <label for="nombre">Nombre completo *</label>
@@ -54,7 +56,7 @@
 
       <!-- Cloudflare Turnstile widget -->
       <div class="turnstile-wrapper">
-        <div class="cf-turnstile" data-sitekey="0x4AAAAAADIa7s30V27Ywbvq" data-language="es" data-theme="light"></div>
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAADIa7s30V27Ywbvq" data-language="es" data-theme="light" data-refresh-expired="auto"></div>
       </div>
 
       <button type="submit" class="submit-btn" id="submitBtn">Enviar</button>
@@ -83,6 +85,8 @@
     ];
     const ALLOWED_EXTENSIONS = ['.pdf', '.doc', '.docx', '.rtf'];
 
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
     function showMessage(text, type) {
       formMessage.textContent = text;
       formMessage.className = 'form-message ' + type;
@@ -95,6 +99,36 @@
       return hasValidExtension && hasValidType;
     }
 
+    // A Turnstile token is single-use: after any failed attempt the widget
+    // must issue a fresh one or the retry is rejected server-side
+    function resetTurnstile() {
+      if (window.turnstile) {
+        try { window.turnstile.reset(); } catch (_) {}
+      }
+    }
+
+    function restoreSubmitButton() {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Enviar';
+    }
+
+    // If challenges.cloudflare.com is blocked (ad blockers, restricted
+    // networks) the widget never renders and the form can't be submitted —
+    // tell the user instead of leaving a dead end
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        if (typeof window.turnstile === 'undefined') {
+          const wrapper = document.querySelector('.turnstile-wrapper');
+          if (wrapper) {
+            wrapper.innerHTML =
+              '<p class="turnstile-fallback">No se pudo cargar la verificación de seguridad. ' +
+              'Desactiva el bloqueador de anuncios y recarga la página, o envíanos tu CV directamente a ' +
+              '<a href="mailto:itadakimas.sushi@gmail.com">itadakimas.sushi@gmail.com</a>.</p>';
+          }
+        }
+      }, 3000);
+    });
+
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
 
@@ -106,6 +140,17 @@
 
       if (!nombre || !telefono || !email || !cvFile) {
         showMessage('Por favor completa todos los campos requeridos.', 'error');
+        return;
+      }
+
+      const telefonoDigits = telefono.replace(/\D/g, '');
+      if (telefonoDigits.length < 8 || telefonoDigits.length > 15) {
+        showMessage('El teléfono no parece válido. Escribe un número de 10 dígitos, ej. 668 123 4567.', 'error');
+        return;
+      }
+
+      if (!EMAIL_RE.test(email)) {
+        showMessage('El correo electrónico no parece válido. Revísalo, ej. tucorreo@ejemplo.com.', 'error');
         return;
       }
 
@@ -146,25 +191,41 @@
           turnstileToken
         };
 
-        // Use no-cors mode to avoid CORS preflight issues with GAS
-        // We can't read the response in no-cors mode, so we assume success
-        // if no network error is thrown
-        await fetch(GAS_URL, {
+        // text/plain keeps this a CORS "simple request" (no preflight, which
+        // GAS doesn't support); the JSON response is readable because GAS
+        // serves Access-Control-Allow-Origin: * on the /exec redirect chain
+        const response = await fetch(GAS_URL, {
           method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'text/plain' },
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(payload)
         });
 
-        // Since no-cors gives an opaque response we can't check status,
-        // so we show success if the request didn't throw
-        form.style.display = 'none';
-        showMessage('¡Gracias! Hemos recibido tu información. Nos pondremos en contacto si surge una oportunidad.', 'success');
+        if (!response.ok) {
+          throw new Error('HTTP ' + response.status);
+        }
+
+        const result = await response.json();
+
+        if (result.status === 'ok') {
+          form.style.display = 'none';
+          showMessage('¡Gracias! Hemos recibido tu información. Nos pondremos en contacto si surge una oportunidad.', 'success');
+        } else if (result.status === 'partial') {
+          form.style.display = 'none';
+          showMessage('Recibimos tus datos, pero tu CV no se pudo guardar. Por favor envíalo a itadakimas.sushi@gmail.com mencionando tu nombre.', 'success');
+        } else if (result.message === 'Verificación de seguridad fallida.') {
+          showMessage('La verificación de seguridad expiró. Completa de nuevo el recuadro de verificación e intenta otra vez.', 'error');
+          resetTurnstile();
+          restoreSubmitButton();
+        } else {
+          showMessage('No se pudo enviar tu solicitud. Por favor intenta de nuevo o escríbenos a itadakimas.sushi@gmail.com.', 'error');
+          resetTurnstile();
+          restoreSubmitButton();
+        }
 
       } catch (err) {
-        showMessage('Ocurrió un error al enviar. Por favor intenta de nuevo.', 'error');
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Enviar';
+        showMessage('Ocurrió un error al enviar. Revisa tu conexión e intenta de nuevo.', 'error');
+        resetTurnstile();
+        restoreSubmitButton();
       }
     });
   </script>

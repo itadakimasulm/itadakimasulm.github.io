@@ -1,6 +1,6 @@
 // ─── Site Config (update these when values change) ───────────────────────────
-const WHATSAPP_NUMBER = "+526681293315";
-const WHATSAPP_MESSAGE = "Hola, me gustaria ordenar";
+const WHATSAPP_NUMBER = "526681293315"; // wa.me format: country code + number, no "+"
+const WHATSAPP_MESSAGE = "Hola, me gustaría ordenar";
 // ─────────────────────────────────────────────────────────────────────────────
 
 // clarity + local script in one file
@@ -21,32 +21,66 @@ const WHATSAPP_MESSAGE = "Hola, me gustaria ordenar";
 function initModalHandlers() {
   const popupForm = document.getElementById("popupForm");
   const modalOverlay = document.getElementById("modalOverlay");
+  const modalClose = document.getElementById("modalClose");
   const registrateButton = document.getElementById("registrateButton");
   const whatsappLink = document.getElementById("whatsappLink");
-  const whatsappSocial = document.getElementById("whatsappSocial");
 
-  // Set both WhatsApp links dynamically from config
   if (whatsappLink) {
     whatsappLink.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
-  }
-  if (whatsappSocial) {
-    whatsappSocial.href = `https://wa.me/${WHATSAPP_NUMBER}`;
   }
 
   // If modal elements aren't on the page, bail quietly
   if (!popupForm || !modalOverlay || !registrateButton) return;
 
-  registrateButton.addEventListener("click", function(event) {
-    event.preventDefault();
+  // Saved so closing the modal can restore the scroll position that
+  // body{position:fixed} (the iOS scroll lock) would otherwise reset to 0
+  let savedScrollY = 0;
+
+  function openModal() {
+    savedScrollY = window.scrollY;
+    document.body.style.top = `-${savedScrollY}px`;
+    document.body.classList.add("modal-open");
     modalOverlay.style.display = "block";
     popupForm.style.display = "block";
-    document.body.classList.add("modal-open");    // lock background scroll
-  });
+    if (modalClose) {
+      modalClose.style.display = "block";
+      modalClose.focus();
+    }
 
-  modalOverlay.addEventListener("click", function() {
+    // If the Weavely embed never loaded (CDN down, blocked), the container
+    // is empty — show a fallback instead of a blank white box. Delayed so a
+    // lazy render still wins.
+    setTimeout(function() {
+      if (popupForm.style.display === "block" && popupForm.childElementCount === 0) {
+        popupForm.innerHTML =
+          '<p class="popup-fallback">No se pudo cargar el formulario de registro. ' +
+          'Recarga la página e intenta de nuevo, o escríbenos por WhatsApp para recibir promociones.</p>';
+      }
+    }, 1500);
+  }
+
+  function closeModal() {
     modalOverlay.style.display = "none";
     popupForm.style.display = "none";
-    document.body.classList.remove("modal-open"); // restore background scroll
+    if (modalClose) modalClose.style.display = "none";
+    document.body.classList.remove("modal-open");
+    document.body.style.top = "";
+    window.scrollTo(0, savedScrollY);
+    registrateButton.focus();
+  }
+
+  registrateButton.addEventListener("click", function(event) {
+    event.preventDefault();
+    openModal();
+  });
+
+  modalOverlay.addEventListener("click", closeModal);
+  if (modalClose) modalClose.addEventListener("click", closeModal);
+
+  document.addEventListener("keydown", function(event) {
+    if (event.key === "Escape" && modalOverlay.style.display === "block") {
+      closeModal();
+    }
   });
 }
 
