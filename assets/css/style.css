@@ -156,6 +156,39 @@ i.fa {
   display: none;
 }
 
+/* Close button for the popup — lightbox style, top-right of the screen */
+#modalClose {
+  display: none;
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 10000;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: #fff;
+  color: #171b2b;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+#modalClose:focus-visible {
+  outline: 2px solid rgba(28, 87, 252, 1);
+  outline-offset: 2px;
+}
+
+/* Shown inside the popup if the Weavely embed fails to load */
+.popup-fallback {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  color: #444;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
 /* ============================================================
    CAREERS PAGE
    Replace the existing CAREERS PAGE block at the bottom of
@@ -256,6 +289,23 @@ i.fa {
   display: flex;
   justify-content: center;
   margin-top: 0.5rem;
+}
+
+/* Shown if the Turnstile script fails to load (ad blockers, restricted networks) */
+.turnstile-fallback {
+  font-size: 0.85rem;
+  color: #c0392b;
+  background: rgba(220, 80, 80, 0.1);
+  border: 1px solid rgba(220, 80, 80, 0.4);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  margin: 0;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.turnstile-fallback a {
+  color: inherit;
 }
 
 .careers-form .submit-btn {

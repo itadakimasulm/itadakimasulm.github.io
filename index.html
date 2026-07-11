@@ -8,8 +8,8 @@
   <title>Itadakimasu Sushi Fusión</title>
   <link rel="stylesheet" href="assets/css/style.css" />
   <link rel="stylesheet" href="assets/css/font-awesome.min.css" />
-  <link rel="icon" href="assets/media/favicon.png" type="image/x-icon" />
-  <script src="https://cdn.weavely.ai/embed.js"></script>
+  <link rel="icon" href="assets/media/favicon.png" type="image/png" />
+  <script src="https://cdn.weavely.ai/embed.js" defer></script>
   <script src="assets/js/script.js" defer></script>
 </head>
 
@@ -29,7 +29,7 @@
     <a class="link Buzz_animation" id="registrateButton" href="#"><i class="fa fa-bell" aria-hidden="true"></i> ¡Regístrate para promociones!</a>
     <a class="link" href="https://www.facebook.com/people/Itadakimasu-Sushi-Fusi%C3%B3n/61577594511317/" target="_blank" rel="noopener noreferrer"><i class="fa fa-facebook-f" aria-hidden="true"></i> Facebook</a>
     <a class="link" href="https://www.instagram.com/itadakimasulm/" target="_blank" rel="noopener noreferrer"><i class="fa fa-instagram" aria-hidden="true"></i> Instagram</a>
-    <a class="link" id="whatsappLink" href="#" target="_blank" rel="noopener noreferrer"><i class="fa fa-whatsapp" aria-hidden="true"></i> WhatsApp</a>
+    <a class="link" id="whatsappLink" href="https://wa.me/526681293315?text=Hola%2C%20me%20gustar%C3%ADa%20ordenar" target="_blank" rel="noopener noreferrer"><i class="fa fa-whatsapp" aria-hidden="true"></i> WhatsApp</a>
     <a class="link" href="https://maps.app.goo.gl/S5nDeDx63SUh92Br7" target="_blank" rel="noopener noreferrer"><i class="fa fa-map-pin" aria-hidden="true"></i> Ubicación</a>
     <a class="link" href="mailto:itadakimas.sushi@gmail.com" rel="noopener noreferrer"><i class="fa fa-envelope" aria-hidden="true"></i> E-mail</a>
     <a class="link" href="careers.html" rel="noopener noreferrer"><i class="fa fa-briefcase" aria-hidden="true"></i> Únete al equipo</a>
@@ -38,7 +38,8 @@
   <div id="modalOverlay"></div>
 
   <!-- Popup Form -->
-  <div id="popupForm" data-weavely-form="6daea6a7-9fe9-4328-8b2b-5ed9e3197012" data-weavely-mode="embed" style="width:100%"></div>
+  <button id="modalClose" type="button" aria-label="Cerrar">&times;</button>
+  <div id="popupForm" role="dialog" aria-modal="true" aria-label="Regístrate para promociones" data-weavely-form="6daea6a7-9fe9-4328-8b2b-5ed9e3197012" data-weavely-mode="embed" style="width:100%"></div>
 </body>
 
 </html>
