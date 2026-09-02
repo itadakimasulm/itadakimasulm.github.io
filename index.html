@@ -9,7 +9,6 @@
   <link rel="stylesheet" href="assets/css/style.css" />
   <link rel="stylesheet" href="assets/css/font-awesome.min.css" />
   <link rel="icon" href="assets/media/favicon.png" type="image/png" />
-  <script src="https://cdn.weavely.ai/embed.js" defer></script>
   <script src="assets/js/script.js" defer></script>
 </head>
 
@@ -26,7 +25,7 @@
   </div>
   <div id="links">
     <a class="link" href="assets/media/menu-2026-01-21.pdf" target="_blank" rel="noopener noreferrer"><i class="fa fa-cutlery" aria-hidden="true"></i> Menú</a>
-    <a class="link Buzz_animation" id="registrateButton" href="#"><i class="fa fa-bell" aria-hidden="true"></i> ¡Regístrate para promociones!</a>
+    <button class="link Buzz_animation" id="registrateButton" type="button"><i class="fa fa-bell" aria-hidden="true"></i> ¡Regístrate para promociones!</button>
     <a class="link" href="https://www.facebook.com/people/Itadakimasu-Sushi-Fusi%C3%B3n/61577594511317/" target="_blank" rel="noopener noreferrer"><i class="fa fa-facebook-f" aria-hidden="true"></i> Facebook</a>
     <a class="link" href="https://www.instagram.com/itadakimasulm/" target="_blank" rel="noopener noreferrer"><i class="fa fa-instagram" aria-hidden="true"></i> Instagram</a>
     <a class="link" id="whatsappLink" href="https://wa.me/526681293315?text=Hola%2C%20me%20gustar%C3%ADa%20ordenar" target="_blank" rel="noopener noreferrer"><i class="fa fa-whatsapp" aria-hidden="true"></i> WhatsApp</a>
@@ -34,12 +33,36 @@
     <a class="link" href="mailto:itadakimas.sushi@gmail.com" rel="noopener noreferrer"><i class="fa fa-envelope" aria-hidden="true"></i> E-mail</a>
     <a class="link" href="careers.html" rel="noopener noreferrer"><i class="fa fa-briefcase" aria-hidden="true"></i> Únete al equipo</a>
   </div>
+
   <!-- Modal Overlay -->
   <div id="modalOverlay"></div>
 
-  <!-- Popup Form -->
-  <button id="modalClose" type="button" aria-label="Cerrar">&times;</button>
-  <div id="popupForm" role="dialog" aria-modal="true" aria-label="Regístrate para promociones" data-weavely-form="6daea6a7-9fe9-4328-8b2b-5ed9e3197012" data-weavely-mode="embed" style="width:100%"></div>
+  <!-- Promo signup modal -->
+  <div id="promoModal" role="dialog" aria-modal="true" aria-labelledby="promoTitle">
+    <button id="promoClose" type="button" aria-label="Cerrar">&times;</button>
+
+    <h2 id="promoTitle">¡Regístrate para promociones!</h2>
+    <p class="promo-copy">
+      Déjanos tus datos y sé de los primeros en enterarte de nuestras promociones,
+      descuentos y novedades.
+    </p>
+
+    <form class="promo-form" id="promoForm" novalidate>
+      <div>
+        <label for="promoCorreo">Correo electrónico *</label>
+        <input type="email" id="promoCorreo" name="correo" required autocomplete="email" placeholder="tucorreo@ejemplo.com" />
+      </div>
+
+      <div>
+        <label for="promoTelefono">Número de teléfono</label>
+        <input type="tel" id="promoTelefono" name="telefono" autocomplete="tel" placeholder="Ej. 668 123 4567" />
+      </div>
+
+      <button type="submit" class="submit-btn" id="promoSubmit">Enviar</button>
+    </form>
+
+    <div class="form-message" id="promoMessage" role="status" aria-live="polite"></div>
+  </div>
 </body>
 
 </html>
