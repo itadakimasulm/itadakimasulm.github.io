@@ -17,8 +17,11 @@
 /** Script Property holding the promo spreadsheet ID. Required. */
 var PROMO_SHEET_ID_PROPERTY = 'PROMO_SPREADSHEET_ID';
 
-/** Script Property naming the target tab. Optional; defaults to the first tab. */
+/** Script Property naming the target tab. Optional; overrides PROMO_SHEET_NAME_DEFAULT. */
 var PROMO_SHEET_NAME_PROPERTY = 'PROMO_SHEET_NAME';
+
+/** The tab promo rows live in. Named rather than positional on purpose. */
+var PROMO_SHEET_NAME_DEFAULT = 'principal';
 
 /**
  * Health check. Visiting the /exec URL in a browser confirms the deployment is
@@ -124,9 +127,9 @@ function handlePromoSubmission(data) {
 }
 
 /**
- * Resolves the promo sheet from Script Properties. Throws with an actionable
- * message when the property is missing, rather than failing deep inside
- * SpreadsheetApp.
+ * Resolves the promo sheet. The spreadsheet ID comes from a Script Property;
+ * the tab is looked up by name. Throws with an actionable message rather than
+ * failing deep inside SpreadsheetApp or writing to the wrong tab.
  *
  * @return {Sheet} The sheet promo rows are appended to.
  */
@@ -142,11 +145,16 @@ function getPromoSheet_() {
   }
 
   var spreadsheet = SpreadsheetApp.openById(spreadsheetId);
-  var sheetName = props.getProperty(PROMO_SHEET_NAME_PROPERTY);
-  var sheet = sheetName ? spreadsheet.getSheetByName(sheetName) : spreadsheet.getSheets()[0];
+  var sheetName = props.getProperty(PROMO_SHEET_NAME_PROPERTY) || PROMO_SHEET_NAME_DEFAULT;
+  var sheet = spreadsheet.getSheetByName(sheetName);
 
+  // Deliberately no fall back to the first tab: a renamed or reordered tab
+  // should fail loudly here rather than quietly divert signups somewhere else
   if (!sheet) {
-    throw new Error('Promo sheet "' + sheetName + '" not found in the spreadsheet.');
+    throw new Error(
+      'Tab "' + sheetName + '" not found. Rename it back, or set Script Property "' +
+      PROMO_SHEET_NAME_PROPERTY + '" to the new name.'
+    );
   }
 
   return sheet;

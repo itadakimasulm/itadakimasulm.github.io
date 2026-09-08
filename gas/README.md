@@ -17,7 +17,7 @@ Property you set in the Apps Script UI:
 | Property | Required | Value |
 | --- | --- | --- |
 | `PROMO_SPREADSHEET_ID` | yes | The promo spreadsheet's ID — the part of its URL between `/d/` and `/edit` |
-| `PROMO_SHEET_NAME` | no | Tab name to append to. Omit to use the first tab. |
+| `PROMO_SHEET_NAME` | no | Tab name to append to. Omit to use `principal`. |
 
 Script Properties are per-project and are not exported with the source, so the
 value never reaches this repository.
@@ -32,9 +32,13 @@ value never reaches this repository.
    the restaurant's. The existing rows are local Sinaloa time, so pick
    `(GMT-07:00) Mazatlán` — otherwise new timestamps are silently offset from
    every row above them.
-5. Confirm the target tab's columns A–C are `Submission Date`,
+5. Confirm the `principal` tab's columns A–C are `Submission Date`,
    `Correo electrónico`, `Número de teléfono`. Values are written positionally;
-   the header text is never read.
+   the header text is never read. Rows are appended below the last one that has
+   content, so existing rows and the header are never touched.
+   The tab is resolved **by name, not by position** — if it is ever renamed the
+   script errors out instead of writing to whichever tab happens to be first.
+   Set `PROMO_SHEET_NAME` to the new name if that happens.
 6. **Run → `testPromoSubmission`.** Approve the authorization prompt (this is
    the step that grants the project access to the spreadsheet). It appends one
    real row — check the timestamp reads as local time and left-aligns like the
