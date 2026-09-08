@@ -269,6 +269,25 @@ button.link {
   text-align: left;
 }
 
+/* After a successful signup the modal collapses to the confirmation alone —
+   the heading, the body copy and the form have nothing left to say. */
+#promoModal.is-success h2,
+#promoModal.is-success .promo-copy,
+#promoModal.is-success .promo-form {
+  display: none;
+}
+
+#promoModal.is-success {
+  padding: 2.5rem 1.75rem;
+}
+
+#promoModal.is-success .form-message {
+  margin-top: 0;
+  text-align: center;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
 @media screen and (max-width: 600px) {
   #promoModal {
     padding: 1.75rem 1.25rem 1.5rem;
