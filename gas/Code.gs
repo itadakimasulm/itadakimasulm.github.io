@@ -53,7 +53,8 @@ function doPost(e) {
 }
 
 /**
- * Appends [Submission Date, Correo, Teléfono] to columns A-C.
+ * Appends to columns A-C: Submission Date, Correo electrónico, Número de
+ * teléfono.
  *
  * `correo` is required. `telefono` is optional and is written as an empty cell
  * when omitted, so column C stays aligned.
@@ -63,7 +64,9 @@ function doPost(e) {
  */
 function handlePromoSubmission(data) {
   var correo = (data.correo ? String(data.correo) : '').trim();
-  var telefono = (data.telefono ? String(data.telefono) : '').trim();
+  // Column C holds bare digits (Sheets stores them as numbers), so drop the
+  // separators a visitor may type into the "Ej. 668 123 4567" placeholder
+  var telefono = (data.telefono ? String(data.telefono) : '').replace(/\D/g, '');
 
   if (!correo) {
     return jsonOutput_({ status: 'error', message: 'El correo electrónico es requerido.' });
@@ -75,21 +78,41 @@ function handlePromoSubmission(data) {
 
   // Bounds a pasted blob or a value long enough to be a payload rather than a
   // contact detail; the endpoint is public and unauthenticated
-  if (correo.length > 254 || telefono.length > 40) {
+  if (correo.length > 254 || telefono.length > 20) {
     return jsonOutput_({ status: 'error', message: 'Los datos enviados no son válidos.' });
   }
 
   try {
     var sheet = getPromoSheet_();
 
-    // Matches the "2026-02-27 00:33:09" text format already in column A
+    // Matches the "2026-01-04 22:46:41" text already in column A
     var formattedDate = Utilities.formatDate(
       new Date(),
       Session.getScriptTimeZone(),
       'yyyy-MM-dd HH:mm:ss'
     );
 
-    sheet.appendRow([formattedDate, correo, telefono]);
+    // The endpoint is public and unauthenticated, so two submissions can land in
+    // the same instant. getLastRow()+setValues is not atomic the way appendRow
+    // is, so serialise it or the second write silently overwrites the first.
+    var lock = LockService.getScriptLock();
+    if (!lock.tryLock(10000)) {
+      return jsonOutput_({ status: 'error', message: 'No se pudo guardar el registro.' });
+    }
+
+    try {
+      var row = sheet.getLastRow() + 1;
+
+      // Column A is plain text, not datetimes — a bare appendRow would let
+      // Sheets parse the string into a date value and the new row would sort
+      // and display unlike every row above it. Format before writing: applying
+      // '@' afterwards would just reveal the serial number.
+      sheet.getRange(row, 1).setNumberFormat('@');
+      sheet.getRange(row, 1, 1, 3).setValues([[formattedDate, correo, telefono]]);
+      SpreadsheetApp.flush();
+    } finally {
+      lock.releaseLock();
+    }
 
     return jsonOutput_({ status: 'ok' });
   } catch (err) {

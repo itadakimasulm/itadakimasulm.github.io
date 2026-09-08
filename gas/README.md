@@ -27,11 +27,18 @@ value never reaches this repository.
 1. **script.google.com → New project.** Name it `Itadakimasu Promo Form`.
 2. Delete the stub contents of the default file and paste all of `Code.gs`.
 3. Add `PROMO_SPREADSHEET_ID` under Project Settings → Script Properties.
-4. Confirm the target tab's columns A–C are `Submission Date`, `Correo`,
-   `Teléfono`. `appendRow` writes positionally and ignores headers.
-5. **Run → `testPromoSubmission`.** Approve the authorization prompt (this is
+4. **Set the project timezone** under Project Settings → Time zone. A new
+   project defaults to the creating account's locale, which is not necessarily
+   the restaurant's. The existing rows are local Sinaloa time, so pick
+   `(GMT-07:00) Mazatlán` — otherwise new timestamps are silently offset from
+   every row above them.
+5. Confirm the target tab's columns A–C are `Submission Date`,
+   `Correo electrónico`, `Número de teléfono`. Values are written positionally;
+   the header text is never read.
+6. **Run → `testPromoSubmission`.** Approve the authorization prompt (this is
    the step that grants the project access to the spreadsheet). It appends one
-   real row — check it landed in the right columns, then delete it.
+   real row — check the timestamp reads as local time and left-aligns like the
+   rows above, then delete it.
    A red run means the property, the sharing, or the tab name is wrong. Fix it
    here, before the endpoint is public.
 
@@ -78,6 +85,18 @@ Edits to `Code.gs` go live only after **Deploy → Manage deployments →** penc
 the existing deployment **→ Version: New version → Deploy**. Saving the editor
 changes nothing. Note the current version number first — rollback is selecting
 it again in the same dialog.
+
+## Column conventions
+
+Matching the rows already in the sheet:
+
+- **A** — plain text, `yyyy-MM-dd HH:mm:ss`. The cell is explicitly formatted as
+  text before writing; left to itself Sheets would parse the string into a date
+  value that sorts and displays unlike the rows above it.
+- **B** — the email as entered, trimmed.
+- **C** — bare digits. Separators are stripped, so `668 123 4567` is stored as
+  `6681234567` and Sheets keeps the column numeric. An omitted phone leaves the
+  cell empty.
 
 ## Known gap
 
