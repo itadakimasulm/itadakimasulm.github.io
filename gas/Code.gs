@@ -73,23 +73,22 @@ function doPost(e) {
  * @return {TextOutput} JSON response the frontend understands.
  */
 function handlePromoSubmission(data) {
-  var correo = (data.correo ? String(data.correo) : '').trim();
-  // Column C holds bare digits (Sheets stores them as numbers), so drop the
-  // separators a visitor may type into the "Ej. 668 123 4567" placeholder
-  var telefono = (data.telefono ? String(data.telefono) : '').replace(/\D/g, '');
+  // Lowercased so one person does not become two rows via "Ana@Gmail.com"
+  var correo = (data.correo ? String(data.correo) : '').trim().toLowerCase();
+  var telefono = normalizePhone_(data.telefono);
 
   if (!correo) {
     return jsonOutput_({ status: 'error', message: 'El correo electrónico es requerido.' });
   }
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(correo)) {
+  // Repeated from the browser rather than trusted from it: this endpoint is
+  // public, so anything the page checks has to be checked again here
+  if (correo.length > 254 || !/^[^\s@]+@[^\s@.]+(?:\.[^\s@.]+)*\.[A-Za-z]{2,}$/.test(correo)) {
     return jsonOutput_({ status: 'error', message: 'El correo electrónico no es válido.' });
   }
 
-  // Bounds a pasted blob or a value long enough to be a payload rather than a
-  // contact detail; the endpoint is public and unauthenticated
-  if (correo.length > 254 || telefono.length > 20) {
-    return jsonOutput_({ status: 'error', message: 'Los datos enviados no son válidos.' });
+  if (telefono && !/^[2-9]\d{9}$/.test(telefono)) {
+    return jsonOutput_({ status: 'error', message: 'El número de teléfono no es válido.' });
   }
 
   try {
@@ -165,6 +164,25 @@ function getPromoSheet_() {
   }
 
   return sheet;
+}
+
+/**
+ * Reduces a phone number to the 10 national digits column C already holds.
+ *
+ * Mexican and US/Canadian numbers are both 10 digits nationally, so the country
+ * code is stripped rather than stored: +52, +52 1 (the legacy Mexican mobile
+ * prefix) and +1. Anything else is returned as bare digits for the caller to
+ * reject.
+ *
+ * @param {*} raw Whatever the visitor typed.
+ * @return {string} 10 digits, or '' when nothing was entered.
+ */
+function normalizePhone_(raw) {
+  var digits = (raw ? String(raw) : '').replace(/\D/g, '');
+  if (digits.length === 13 && digits.slice(0, 3) === '521') return digits.slice(3);
+  if (digits.length === 12 && digits.slice(0, 2) === '52') return digits.slice(2);
+  if (digits.length === 11 && digits.charAt(0) === '1') return digits.slice(1);
+  return digits;
 }
 
 /** JSON response helper. */

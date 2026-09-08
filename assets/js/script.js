@@ -9,7 +9,27 @@ const CAREERS_GAS_URL = "https://script.google.com/macros/s/AKfycbwuVq9wLPrGa2KX
 // from the browser — so it lives here alongside the careers one. While it is
 // empty the modal says registration is unavailable instead of posting nowhere.
 const PROMO_GAS_URL = "https://script.google.com/macros/s/AKfycbzbdwUitv0WFMAsH46gFAo-yHKShr9DcS1igdakh-Sfsp-1mFvxVl8tctkKJXcB2j3H/exec";
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+// Deliberately permissive: it rejects the shapes that are certainly wrong
+// (no @, no dot, a numeric or one-letter TLD) and lets everything else through.
+// A stricter pattern rejects real addresses without catching the error that
+// actually happens, which is a typo inside a plausible domain.
+const EMAIL_RE = /^[^\s@]+@[^\s@.]+(?:\.[^\s@.]+)*\.[A-Za-z]{2,}$/;
+
+// Mexican and US/Canadian numbers, entered any way a person might type them.
+// Both are 10 national digits whose first digit is 2-9, so one rule covers
+// them once the country code is off: +52 / +52 1 (the legacy Mexican mobile
+// prefix, still printed on plenty of business cards) or +1.
+function normalizePhone(raw) {
+  var digits = String(raw || "").replace(/\D/g, "");
+  if (digits.length === 13 && digits.slice(0, 3) === "521") return digits.slice(3);
+  if (digits.length === 12 && digits.slice(0, 2) === "52") return digits.slice(2);
+  if (digits.length === 11 && digits.charAt(0) === "1") return digits.slice(1);
+  return digits;
+}
+
+function isValidPhone(normalized) {
+  return /^[2-9]\d{9}$/.test(normalized);
+}
 // ─────────────────────────────────────────────────────────────────────────────
 
 // clarity + local script in one file
@@ -61,7 +81,18 @@ function initModalHandlers() {
     promoMessage.className = "form-message";
   }
 
+  // Returns the modal to its blank state. Called on open rather than on close
+  // so the success message stays readable until the visitor dismisses it, and
+  // so reopening always offers a fresh submission.
+  function resetModal() {
+    promoModal.classList.remove("is-success");
+    promoForm.reset();
+    restoreSubmitButton();
+    clearMessage();
+  }
+
   function openModal() {
+    resetModal();
     savedScrollY = window.scrollY;
     document.body.style.top = `-${savedScrollY}px`;
     document.body.classList.add("modal-open");
@@ -96,8 +127,11 @@ function initModalHandlers() {
   promoForm.addEventListener("submit", async function(event) {
     event.preventDefault();
 
-    const correo = promoCorreo.value.trim();
-    const telefono = promoTelefono.value.trim();
+    // Lowercased so the same person submitting "Ana@Gmail.com" and
+    // "ana@gmail.com" does not become two rows. Every major provider treats the
+    // local part case-insensitively, whatever the RFC allows.
+    const correo = promoCorreo.value.trim().toLowerCase();
+    const telefono = normalizePhone(promoTelefono.value);
 
     if (!correo) {
       showMessage("Por favor escribe tu correo electrónico.", "error");
@@ -105,20 +139,17 @@ function initModalHandlers() {
       return;
     }
 
-    if (!EMAIL_RE.test(correo)) {
+    if (!EMAIL_RE.test(correo) || correo.length > 254) {
       showMessage("El correo electrónico no parece válido. Revísalo, ej. tucorreo@ejemplo.com.", "error");
       promoCorreo.focus();
       return;
     }
 
-    // Phone is optional, but a value that's there should still look like a number
-    if (telefono) {
-      const telefonoDigits = telefono.replace(/\D/g, "");
-      if (telefonoDigits.length < 8 || telefonoDigits.length > 15) {
-        showMessage("El teléfono no parece válido. Escribe un número de 10 dígitos, ej. 668 123 4567.", "error");
-        promoTelefono.focus();
-        return;
-      }
+    // Optional, but a value that is there has to be a number we could dial
+    if (promoTelefono.value.trim() && !isValidPhone(telefono)) {
+      showMessage("El teléfono no parece válido. Escribe 10 dígitos, ej. 668 123 4567 (o con lada: +52 o +1).", "error");
+      promoTelefono.focus();
+      return;
     }
 
     if (!PROMO_GAS_URL) {
@@ -147,7 +178,9 @@ function initModalHandlers() {
       const result = await response.json();
 
       if (result.status === "ok") {
-        promoForm.style.display = "none";
+        // CSS hides the heading, the body copy and the form, leaving only the
+        // confirmation. Reopening the modal clears this via resetModal().
+        promoModal.classList.add("is-success");
         showMessage("¡Listo! Te avisaremos de nuestras próximas promociones.", "success");
       } else {
         showMessage("No se pudo completar tu registro. Intenta de nuevo o escríbenos a itadakimas.sushi@gmail.com.", "error");
