@@ -9,9 +9,16 @@
  * Backs the "¡Regístrate para promociones!" modal on index.html, which posts
  * {formType:'promo', correo, telefono} and reads back {status:'ok'}.
  *
- * No spreadsheet ID lives in this repo. The ID is read at runtime from a Script
- * Property set by hand in the Apps Script UI (Project Settings > Script
- * Properties). See gas/README.md.
+ * No spreadsheet ID lives in this repo. It is read at runtime from a Script
+ * Property set by hand under Project Settings > Script Properties:
+ *
+ *   PROMO_SPREADSHEET_ID  required  the promo spreadsheet's ID, the part of its
+ *                                   URL between /d/ and /edit
+ *   PROMO_SHEET_NAME      optional  tab to append to; defaults to 'principal'
+ *
+ * Deploy > Manage deployments > edit the existing deployment > New version.
+ * Saving the editor changes nothing; the /exec URL survives a new version but
+ * a "New deployment" mints a different one the site does not call.
  */
 
 /** Script Property holding the promo spreadsheet ID. Required. */
