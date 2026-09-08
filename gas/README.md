@@ -74,14 +74,26 @@ Open the `/exec` URL in a browser. `doGet` answers:
 Then the real path:
 
 ```bash
-curl -sL -X POST \
+curl -sL \
   -H 'Content-Type: text/plain;charset=utf-8' \
-  -d '{"formType":"promo","correo":"prueba@ejemplo.com","telefono":"6681234567"}' \
+  -d '{"formType":"promo","correo":"prueba@ejemplo.com","telefono":"668 123 4567"}' \
   '<PROMO /exec URL>'
 ```
 
-`-L` is required; Apps Script answers with a redirect. Expect `{"status":"ok"}`
-and a new row.
+Expect `{"status":"ok"}` and a new row whose column C reads `6681234567` — the
+separators are stripped.
+
+Two curl details, both of which look like the script is broken when you get them
+wrong:
+
+- **`-L` is required.** Apps Script runs the script and then 302s to a
+  `googleusercontent.com` URL that serves the result. Without `-L` you only see
+  the redirect.
+- **Do not add `-X POST`.** `-d` already makes the first request a POST. `-X`
+  *pins* the method, so curl re-POSTs to the result URL, which only serves GET —
+  and Drive answers with an HTML `Page Not Found` page. The script ran fine; only
+  the fetch of its output failed. Browsers do this correctly, so this trips up
+  command-line testing only.
 
 ## Updating later
 

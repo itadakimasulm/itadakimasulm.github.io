@@ -5,9 +5,10 @@ const WHATSAPP_MESSAGE = "Hola, me gustaría ordenar";
 // to one backend cannot take the other down. Read by careers.html and by the
 // promo modal below.
 const CAREERS_GAS_URL = "https://script.google.com/macros/s/AKfycbwuVq9wLPrGa2KXZ2tap2gfglf9aSKaQup35p02bUc9qzSHLGVw0w9KlJrHeqOTlz2bRQ/exec";
-// Paste the promo project's /exec URL here after deploying gas/Code.gs. While
-// it is empty the modal says so instead of posting into the void.
-const PROMO_GAS_URL = "";
+// The promo project's /exec URL. Public by construction — the modal calls it
+// from the browser — so it lives here alongside the careers one. While it is
+// empty the modal says registration is unavailable instead of posting nowhere.
+const PROMO_GAS_URL = "https://script.google.com/macros/s/AKfycbzbdwUitv0WFMAsH46gFAo-yHKShr9DcS1igdakh-Sfsp-1mFvxVl8tctkKJXcB2j3H/exec";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 // ─────────────────────────────────────────────────────────────────────────────
 
