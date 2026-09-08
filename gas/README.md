@@ -1,13 +1,16 @@
-# Apps Script backend
+# Apps Script backend — promo signups
 
-The live source lives in the Apps Script project behind the site's `/exec`
-endpoint, not in this repo. `promo.gs` is the promo-signup module kept here so
-the routing is reviewable in git; it is pasted into that project by hand.
+`Code.gs` is the **entire** script for a standalone Apps Script project that
+backs the "¡Regístrate para promociones!" modal on `index.html`.
+
+It is a separate project from **Itadakimasu Careers Form**, with its own `/exec`
+URL. Nothing here touches the careers deployment: the two backends fail
+independently, and a bad promo deploy cannot take job applications down.
 
 ## No IDs in this repo
 
-Spreadsheet IDs are **not** committed. They are read at runtime from Script
-Properties, which you set in the Apps Script UI:
+The spreadsheet ID is **not** committed. It is read at runtime from a Script
+Property you set in the Apps Script UI:
 
 **Project Settings → Script Properties → Add script property**
 
@@ -19,65 +22,66 @@ Properties, which you set in the Apps Script UI:
 Script Properties are per-project and are not exported with the source, so the
 value never reaches this repository.
 
-## Installing `promo.gs`
+## Setup
 
-1. Open the Apps Script project (Extensions → Apps Script from the bound sheet,
-   or script.google.com).
-2. **File → New → Script file**, name it `promo`. Paste the whole of
-   `promo.gs` into it.
-   It defines no `doPost` and no `doGet`, so it cannot collide with the entry
-   points the careers form already uses.
-3. Set `PROMO_SPREADSHEET_ID` as above.
-4. Confirm columns A–C of the target tab are `Submission Date`, `Correo`,
+1. **script.google.com → New project.** Name it `Itadakimasu Promo Form`.
+2. Delete the stub contents of the default file and paste all of `Code.gs`.
+3. Add `PROMO_SPREADSHEET_ID` under Project Settings → Script Properties.
+4. Confirm the target tab's columns A–C are `Submission Date`, `Correo`,
    `Teléfono`. `appendRow` writes positionally and ignores headers.
-5. **Run → `testPromoSubmission`** and approve the authorization prompt. It
-   appends one real row; check it landed in the right columns, then delete it.
-   A red run means the property, the sharing, or the tab name is wrong — fix it
-   here, before any visitor can hit it.
-
-## Wiring the route
-
-In the existing script file, find where `doPost` parses the request body into a
-variable (`JSON.parse(e.postData.contents)`). Immediately after that line, add:
-
-```javascript
-if (data.formType === 'promo') {
-  return handlePromoSubmission(data);
-}
-```
-
-Substitute whatever the parsed variable is actually called. Everything below
-that line — the careers path — is untouched. Careers submissions send no
-`formType`, so they fall through exactly as before.
+5. **Run → `testPromoSubmission`.** Approve the authorization prompt (this is
+   the step that grants the project access to the spreadsheet). It appends one
+   real row — check it landed in the right columns, then delete it.
+   A red run means the property, the sharing, or the tab name is wrong. Fix it
+   here, before the endpoint is public.
 
 ## Deploying
 
-**Deploy → Manage deployments →** pencil on the *existing* deployment **→
-Version: New version → Deploy**.
+**Deploy → New deployment → Web app.**
 
-Editing the existing deployment keeps the `/exec` URL. Choosing "New deployment"
-mints a *different* URL that the site does not call, which looks exactly like
-the code not working. Confirm **Execute as: Me** and **Who has access: Anyone**
-survive the redeploy.
+- Description: `promo v1`
+- Execute as: **Me**
+- Who has access: **Anyone**
 
-Note the previous version number first — rolling back is selecting it again in
-the same dialog.
+This is a brand-new project, so "New deployment" is correct — it mints the
+`/exec` URL this backend needs. (For the *careers* project the rule is the
+opposite: always edit the existing deployment and pick "New version", or its URL
+changes and the site stops reaching it.)
+
+Copy the `/exec` URL. Paste it into `PROMO_GAS_URL` in
+`assets/js/script.js` and commit — until that constant is filled in, the modal
+tells visitors registration is unavailable rather than posting into the void.
 
 ## Verifying
+
+Open the `/exec` URL in a browser. `doGet` answers:
+
+```json
+{"status":"ok","message":"Itadakimasu promo endpoint is live"}
+```
+
+Then the real path:
 
 ```bash
 curl -sL -X POST \
   -H 'Content-Type: text/plain;charset=utf-8' \
   -d '{"formType":"promo","correo":"prueba@ejemplo.com","telefono":"6681234567"}' \
-  'https://script.google.com/macros/s/.../exec'
+  '<PROMO /exec URL>'
 ```
 
 `-L` is required; Apps Script answers with a redirect. Expect `{"status":"ok"}`
-and a new row. Then submit the careers form once to confirm it still works —
-that is the regression that matters.
+and a new row.
+
+## Updating later
+
+Edits to `Code.gs` go live only after **Deploy → Manage deployments →** pencil on
+the existing deployment **→ Version: New version → Deploy**. Saving the editor
+changes nothing. Note the current version number first — rollback is selecting
+it again in the same dialog.
 
 ## Known gap
 
-The promo branch has no Turnstile check and no rate limit, and the `/exec` URL
-is in public JavaScript. Anyone can append rows to the promo sheet with a single
-`curl` loop.
+There is no Turnstile check and no rate limit, and the `/exec` URL is in public
+JavaScript. Anyone can append rows to the promo sheet with a `curl` loop. The
+input-length bounds in `handlePromoSubmission` limit the damage per row; they do
+not limit the number of rows.

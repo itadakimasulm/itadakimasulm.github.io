@@ -1,9 +1,13 @@
 // ─── Site Config (update these when values change) ───────────────────────────
 const WHATSAPP_NUMBER = "526681293315"; // wa.me format: country code + number, no "+"
 const WHATSAPP_MESSAGE = "Hola, me gustaría ordenar";
-// Single Apps Script deployment behind both forms; the `formType` field in the
-// payload picks the branch in doPost (careers = default, promo = 'promo')
-const GAS_URL = "https://script.google.com/macros/s/AKfycbwuVq9wLPrGa2KXZ2tap2gfglf9aSKaQup35p02bUc9qzSHLGVw0w9KlJrHeqOTlz2bRQ/exec";
+// Each form has its own Apps Script project and its own /exec URL, so a change
+// to one backend cannot take the other down. Read by careers.html and by the
+// promo modal below.
+const CAREERS_GAS_URL = "https://script.google.com/macros/s/AKfycbwuVq9wLPrGa2KXZ2tap2gfglf9aSKaQup35p02bUc9qzSHLGVw0w9KlJrHeqOTlz2bRQ/exec";
+// Paste the promo project's /exec URL here after deploying gas/Code.gs. While
+// it is empty the modal says so instead of posting into the void.
+const PROMO_GAS_URL = "";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -116,6 +120,11 @@ function initModalHandlers() {
       }
     }
 
+    if (!PROMO_GAS_URL) {
+      showMessage("El registro no está disponible por el momento. Escríbenos por WhatsApp y te agregamos a la lista.", "error");
+      return;
+    }
+
     clearMessage();
     promoSubmit.disabled = true;
     promoSubmit.textContent = "Enviando...";
@@ -124,7 +133,7 @@ function initModalHandlers() {
       // text/plain keeps this a CORS "simple request" (no preflight, which
       // GAS doesn't support); the JSON response is readable because GAS
       // serves Access-Control-Allow-Origin: * on the /exec redirect chain
-      const response = await fetch(GAS_URL, {
+      const response = await fetch(PROMO_GAS_URL, {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({ formType: "promo", correo, telefono })

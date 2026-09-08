@@ -70,8 +70,8 @@
   </div>
 
   <script>
-    // GAS_URL and EMAIL_RE come from assets/js/script.js (shared by both forms);
-    // they're read inside the submit handler, so the deferred script has run by then
+    // CAREERS_GAS_URL and EMAIL_RE come from assets/js/script.js; they're read
+    // inside the submit handler, so the deferred script has run by then
     const form = document.getElementById('careersForm');
     const submitBtn = document.getElementById('submitBtn');
     const formMessage = document.getElementById('formMessage');
@@ -192,7 +192,7 @@
         // text/plain keeps this a CORS "simple request" (no preflight, which
         // GAS doesn't support); the JSON response is readable because GAS
         // serves Access-Control-Allow-Origin: * on the /exec redirect chain
-        const response = await fetch(GAS_URL, {
+        const response = await fetch(CAREERS_GAS_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(payload)
