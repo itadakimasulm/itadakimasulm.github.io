@@ -47,15 +47,18 @@
       descuentos y novedades.
     </p>
 
-    <form class="promo-form" id="promoForm" novalidate>
+    <form class="promo-form" id="promoForm">
       <div>
         <label for="promoCorreo">Correo electrónico *</label>
-        <input type="email" id="promoCorreo" name="correo" required autocomplete="email" placeholder="tucorreo@ejemplo.com" />
+        <input type="email" id="promoCorreo" name="correo" required maxlength="254" autocomplete="email" placeholder="tucorreo@ejemplo.com" />
       </div>
 
       <div>
         <label for="promoTelefono">Número de teléfono</label>
-        <input type="tel" id="promoTelefono" name="telefono" autocomplete="tel" placeholder="Ej. 668 123 4567" />
+        <input type="tel" id="promoTelefono" name="telefono" autocomplete="tel"
+               inputmode="tel" maxlength="20" pattern="(\D*\d){10,}\D*"
+               title="Escribe al menos 10 dígitos, ej. 668 123 4567"
+               placeholder="Ej. 668 123 4567" />
       </div>
 
       <button type="submit" class="submit-btn" id="promoSubmit">Enviar</button>

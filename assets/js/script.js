@@ -9,27 +9,6 @@ const CAREERS_GAS_URL = "https://script.google.com/macros/s/AKfycbwuVq9wLPrGa2KX
 // from the browser — so it lives here alongside the careers one. While it is
 // empty the modal says registration is unavailable instead of posting nowhere.
 const PROMO_GAS_URL = "https://script.google.com/macros/s/AKfycbzbdwUitv0WFMAsH46gFAo-yHKShr9DcS1igdakh-Sfsp-1mFvxVl8tctkKJXcB2j3H/exec";
-// Deliberately permissive: it rejects the shapes that are certainly wrong
-// (no @, no dot, a numeric or one-letter TLD) and lets everything else through.
-// A stricter pattern rejects real addresses without catching the error that
-// actually happens, which is a typo inside a plausible domain.
-const EMAIL_RE = /^[^\s@]+@[^\s@.]+(?:\.[^\s@.]+)*\.[A-Za-z]{2,}$/;
-
-// Mexican and US/Canadian numbers, entered any way a person might type them.
-// Both are 10 national digits whose first digit is 2-9, so one rule covers
-// them once the country code is off: +52 / +52 1 (the legacy Mexican mobile
-// prefix, still printed on plenty of business cards) or +1.
-function normalizePhone(raw) {
-  var digits = String(raw || "").replace(/\D/g, "");
-  if (digits.length === 13 && digits.slice(0, 3) === "521") return digits.slice(3);
-  if (digits.length === 12 && digits.slice(0, 2) === "52") return digits.slice(2);
-  if (digits.length === 11 && digits.charAt(0) === "1") return digits.slice(1);
-  return digits;
-}
-
-function isValidPhone(normalized) {
-  return /^[2-9]\d{9}$/.test(normalized);
-}
 // ─────────────────────────────────────────────────────────────────────────────
 
 // clarity + local script in one file
@@ -127,30 +106,15 @@ function initModalHandlers() {
   promoForm.addEventListener("submit", async function(event) {
     event.preventDefault();
 
-    // Lowercased so the same person submitting "Ana@Gmail.com" and
-    // "ana@gmail.com" does not become two rows. Every major provider treats the
-    // local part case-insensitively, whatever the RFC allows.
+    // Format is enforced by the input attributes in index.html: required +
+    // type="email" on the address, pattern on the phone. The submit event does
+    // not fire at all until the browser is satisfied, so there is nothing left
+    // to re-check here.
+    //
+    // Lowercased so one person submitting "Ana@Gmail.com" and "ana@gmail.com"
+    // does not become two rows; Code.gs reduces the phone to bare digits.
     const correo = promoCorreo.value.trim().toLowerCase();
-    const telefono = normalizePhone(promoTelefono.value);
-
-    if (!correo) {
-      showMessage("Por favor escribe tu correo electrónico.", "error");
-      promoCorreo.focus();
-      return;
-    }
-
-    if (!EMAIL_RE.test(correo) || correo.length > 254) {
-      showMessage("El correo electrónico no parece válido. Revísalo, ej. tucorreo@ejemplo.com.", "error");
-      promoCorreo.focus();
-      return;
-    }
-
-    // Optional, but a value that is there has to be a number we could dial
-    if (promoTelefono.value.trim() && !isValidPhone(telefono)) {
-      showMessage("El teléfono no parece válido. Escribe 10 dígitos, ej. 668 123 4567 (o con lada: +52 o +1).", "error");
-      promoTelefono.focus();
-      return;
-    }
+    const telefono = promoTelefono.value.trim();
 
     if (!PROMO_GAS_URL) {
       showMessage("El registro no está disponible por el momento. Escríbenos por WhatsApp y te agregamos a la lista.", "error");

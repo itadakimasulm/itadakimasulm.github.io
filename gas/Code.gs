@@ -77,17 +77,15 @@ function handlePromoSubmission(data) {
   var correo = (data.correo ? String(data.correo) : '').trim().toLowerCase();
   var telefono = normalizePhone_(data.telefono);
 
-  if (!correo) {
+  // A loose mirror of what index.html's input attributes enforce. The page's
+  // rules do not reach anything posting straight to this URL, but the point
+  // here is keeping junk out of the sheet, not deciding whether an address is
+  // real — only a confirmation email could do that.
+  if (!correo || correo.length > 254 || correo.indexOf('@') < 1) {
     return jsonOutput_({ status: 'error', message: 'El correo electrónico es requerido.' });
   }
 
-  // Repeated from the browser rather than trusted from it: this endpoint is
-  // public, so anything the page checks has to be checked again here
-  if (correo.length > 254 || !/^[^\s@]+@[^\s@.]+(?:\.[^\s@.]+)*\.[A-Za-z]{2,}$/.test(correo)) {
-    return jsonOutput_({ status: 'error', message: 'El correo electrónico no es válido.' });
-  }
-
-  if (telefono && !/^[2-9]\d{9}$/.test(telefono)) {
+  if (telefono && telefono.length < 10) {
     return jsonOutput_({ status: 'error', message: 'El número de teléfono no es válido.' });
   }
 
