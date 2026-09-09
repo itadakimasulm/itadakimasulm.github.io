@@ -70,8 +70,8 @@
   </div>
 
   <script>
-    // CAREERS_GAS_URL and EMAIL_RE come from assets/js/script.js; they're read
-    // inside the submit handler, so the deferred script has run by then
+    // CAREERS_GAS_URL comes from assets/js/script.js; it's read inside the
+    // submit handler, so the deferred script has run by then
     const form = document.getElementById('careersForm');
     const submitBtn = document.getElementById('submitBtn');
     const formMessage = document.getElementById('formMessage');
@@ -144,11 +144,6 @@
       const telefonoDigits = telefono.replace(/\D/g, '');
       if (telefonoDigits.length < 8 || telefonoDigits.length > 15) {
         showMessage('El teléfono no parece válido. Escribe un número de 10 dígitos, ej. 668 123 4567.', 'error');
-        return;
-      }
-
-      if (!EMAIL_RE.test(email)) {
-        showMessage('El correo electrónico no parece válido. Revísalo, ej. tucorreo@ejemplo.com.', 'error');
         return;
       }
 
